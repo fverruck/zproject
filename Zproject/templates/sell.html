@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Buy
+{% endblock %}
+
+{% block main %}
+    <form action="/sell" method="post">
+        <div class="form-group">
+            <select name="symbol">
+                <option disabled="stock" selected="" value="">Stock</option>
+                    {% for symbol in symbols %}
+                    <option value = "{{ symbol.quote_symbol }}">{{ symbol.quote_symbol }}</option>
+                    {% endfor %}
+            </select>
+        </div>
+        <p>
+        <div class="form-group">
+            <input class="form-control" name="shares" placeholder="Shares" type="text">
+        </div>
+
+        <button class="btn btn-primary" type="submit">Sell</button>
+
+    </form>
+
+    <script>
+    document.querySelector("form").onsubmit = function() {
+        if (!document.querySelector("select").value) {
+            alert("You must provide the stocks you want to sell");
+            return false;
+        }
+        else if (!document.querySelector("input").value) {
+            alert("You must provide the amount of shares you want to sell");
+            return false;
+        }
+        };
+    </script>
+
+
+{% endblock %}

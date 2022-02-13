@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Cadastre seu negocio
+{% endblock %}
+
+{% block main %}
+    <div class= "form-row-cad">   
+        <form action="/cadastro" method="post">        
+            <div class="form-row-cadastro">
+                    <div class = "form-row-cadastro-title">
+                        <p><b>Cadastre-se para oferecer <span class = "blue"> as melhores facilidades</span> aos seus clientes</b></p>
+                    </div>
+            </div>   
+            <div class="form-row-cadastro">
+                    <input autocomplete="off" class="form-control" name="empresa" placeholder="Nome da empresa" type="text">
+            </div>              
+            <div class= "form-row-cadastro">
+                    <input autocomplete="off" class="form-control" name="nome" placeholder="Seu nome completo" type="text">
+            </div>            
+            <div class="form-row-cadastro">
+                    <input class="form-control" name="email" placeholder="E-mail de contato" type="email">
+            </div>         
+            <div class= "form-row-cadastro">
+                <select class="form-control" required name= "tipo">
+                    <option selected>Tipo de empresa:</option>
+                    <option value="1">Barbearia</option>
+                    <option value="2">Salão de Beleza</option>
+                    <option value="3">Personal Trainer</option>
+                    <option value="4">Estética corporal</option>
+                    <option value="5">Quiropraxia</option>
+                    <option value="6">Fisioterapia</option>
+                </select>
+            </div>
+            <div class="form-row-cadastro">
+                        <select class="form-control" required name= "cronogramas" >
+                          <option selected>Número de pessoas que fazem atendimento</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                          <option value="6">6</option>
+                        </select>
+            </div>
+            <div class="form-row-cadastro">
+                <div class= "col-md-6 mb-2">
+                        <label for= "inicio">Início do expediente:</label>
+                        <input class="form-control" name="inicio" type="time">
+                </div>
+                <div class= "col-md-6 mb-2">
+                        <label for= "fim">Fim do expediente:</label>
+                        <input class="form-control" name="fim" type="time">
+                </div>
+            </div>    
+            <div class="form-row-cadastro">
+                  <div class= "col-md-6 mb-2">
+                        <label for= "duracao">Pausa para Almoço</label>
+                            <select class="form-control" name= "almoco-tempo" >
+                              <option value="0">Não fecha</option>
+                              <option value="30">30 minutos</option>
+                              <option value="60">1 hora</option>
+                              <option value="90">1 hora e meia</option>
+                              <option value="120">2 horas</option>
+                            </select>
+                  </div>             
+                <div class= "col-md-6 mb-2">
+                        <label for= "fim">Almoço (início):</label>
+                        <input class="form-control" name="almoco" type="time">
+                </div>
+            </div>    
+            <div class="form-row-cadastro">     
+                <button class="btn btn-primary" type="submit">Cadastrar</button>  
+            </div>       
+        </form>
+     </div>    
+    <script>
+    document.querySelector("form").onsubmit = function() {
+        if (!document.querySelector("input").value) {
+            alert("VOCE NAO ESCREVEU NADA");
+            return false;
+        }
+    };
+    </script>
+{% endblock %}
