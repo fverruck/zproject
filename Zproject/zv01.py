@@ -14,10 +14,9 @@ from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
-
+import certifi
+from pymongo import MongoClient
 from helpers import apology, login_required, lookup, usd
-
-
 
 # Configure application
 app = Flask(__name__)
@@ -52,18 +51,19 @@ def register():
     # RUN WHEN USER SUBMIT REGISTRATION
     if request.method == "POST":
 
+        #connect to MongoDatabase
+        ca = certifi.where()
+        client = MongoClient("mongodb+srv://fverruck:ik2-y47-dia-76Z@cluster0.g9gze.mongodb.net/result?retryWrites=true&w=majority", tlsCAFile=ca)
+        # open senhas database to include new password
+        senhas = client.result.senhas
         # hash password to protect user
         hash = generate_password_hash(request.form.get("password"))
-        #open z.db database to start manipulation
-        users = sqlite3.connect('/Users/fabioverruck/Documents/MACHINE_LEARNING/Zproject/z.db')  
-        # create a cursor to manipulate data in z.db
-        cursor = users.cursor()
+        user = request.form.get("username")
+        #create variable to check if user already exists
+        check = senhas.find_one({"login" : user})
+
         # store username and password in data variable
-        data = [(request.form.get("username"), hash)]
-        #insert data (username, password) into z.db
-        new_user = cursor.executemany("INSERT INTO users (username, password) VALUES (?, ?)", data)
-        
-        users.commit()
+        new_user = {"login": user, "senha": hash}
 
         #confirm username and password were provided
         if not request.form.get("username") or not request.form.get("password") or not request.form.get("confirmation"):
@@ -78,22 +78,22 @@ def register():
             return apology("blank spaces are not allowed", 400)
         
         #verify if the user does not already exist
-        elif not new_user:
-            return redirect("/register", 400)
+        elif check:
+            return apology("username already exists, try a different one", 400)
         
         #Registration logic
         else:
-
+            #insert data (username, password) into z.db
+            senhas.insert_one(new_user)
                     
             # allow new registrant to continue logged in after registration
-            session["user_id"] = data[0][0]
+            session["user_id"] = user
 
             # show registered message after registration
             flash("Registered!")
 
             # redirect user to initial page after login
             return redirect("/")   
-
 
     # DEFAULT PAGE
     else:
@@ -103,12 +103,17 @@ def register():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Log user in"""
-
     # Forget any user_id
     session.clear()
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
+
+        #connect to MongoDatabase
+        ca = certifi.where()
+        client = MongoClient("mongodb+srv://fverruck:ik2-y47-dia-76Z@cluster0.g9gze.mongodb.net/result?retryWrites=true&w=majority", tlsCAFile=ca)
+        # open senhas database to include new password
+        senhas = client.result.senhas
 
         # Ensure username was submitted
         if not request.form.get("username"):
@@ -118,21 +123,18 @@ def login():
         elif not request.form.get("password"):
             return apology("must provide password", 403)
 
-        #open z.db database to start manipulation
-        users = sqlite3.connect('/Users/fabioverruck/Documents/MACHINE_LEARNING/Zproject/z.db')  
-        # create a cursor to manipulate data in z.db
-        cursor = users.cursor()
         # Query database for username
         user = request.form.get('username')
-        cursor.execute("SELECT * FROM users WHERE username = ?", (user,))
-        rows = cursor.fetchone()
-
+        checking = senhas.find_one({"login" : user})
+        
         # Ensure username exists and password is correct
-        if not check_password_hash(rows[1], request.form.get("password")):
+        if not checking:
+            return apology("invalid username and/or password", 403)
+        elif not check_password_hash(checking['senha'], request.form.get("password")):
             return apology("invalid username and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]
+        session["user_id"] = user
 
         # Redirect user to home page
         return redirect("/")
